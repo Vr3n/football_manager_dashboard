@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from streamlit import session_state as ss
+from analyser import cleaning_data
 
 st.set_page_config(
     layout="wide",
@@ -29,4 +30,18 @@ if ss['squad_data'] is None:
         st.rerun()
 
 if ss['squad_data'] is not None:
-    st.dataframe(ss['squad_data'].sample(5))
+    ss['squad_data'] = cleaning_data.drop_columns(ss['squad_data'], ['Ability','Injury Risk', 'SHP', 'CON', 'Fatigue', 'Position Selected', "Potential", 'Overall Happiness'])
+
+
+    ss['squad_data'][['Appearances', 'Substitute Appearances']] = cleaning_data.appearances_fix(ss['squad_data'], col_name="Apps")
+
+    cleaning_data.unit_values_to_numeric(ss['squad_data'],['Height', 'Distance', 'Dist/90', 'Wage'])
+
+
+    percentage_columns = cleaning_data.detect_percentage_columns(ss['squad_data'])
+
+    ss['squad_data'].loc[:, percentage_columns] = cleaning_data.convert_percentage_to_numeric(ss['squad_data'][percentage_columns])
+
+    ss['squad_data'] = cleaning_data.fill_na(ss['squad_data'])
+
+
