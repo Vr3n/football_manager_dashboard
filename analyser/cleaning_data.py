@@ -63,6 +63,8 @@ def unit_values_to_numeric(df: pd.DataFrame, col_names: List[str]) -> None:
     """
 
     for column in col_names:
+        if df[column].dtype != 'O':
+            continue
         df[column] = df[column].str.extract('(\d+)').astype(float)
 
 
