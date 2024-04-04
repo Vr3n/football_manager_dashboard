@@ -6,7 +6,6 @@ runOnSave = true
 [theme]
 
 primaryColor="#51829B"
-backgroundColor="#FBF9F0"
-secondaryColor="#F6995C"
+backgroundColor="#FFF"
 textColor="#1A1B1D"
 font="serif"

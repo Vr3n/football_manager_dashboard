@@ -4,6 +4,7 @@ import streamlit_shadcn_ui as ui
 
 from streamlit import session_state as ss
 from analyser import cleaning_data, attributes, plots
+from components import containers
 
 st.set_page_config(
     layout="wide",
@@ -51,7 +52,11 @@ if ss['squad_data'] is not None:
                          ] = cleaning_data.appearances_fix(ss['squad_data'], col_name="Apps")
 
         cleaning_data.unit_values_to_numeric(
-            ss['squad_data'], ['Height', 'Distance', 'Dist/90', 'Wage'])
+            ss['squad_data'], ['Height', 'Distance', 'Dist/90'])
+
+        if ss['squad_data']["Wage"].dtypes == 'O':
+            ss['squad_data']['Wage'] = ss['squad_data']['Wage'].str.extract(r'£?(\d+,?\d*)').fillna(0)
+            ss['squad_data']['Wage'] = ss['squad_data']['Wage'].str.replace(',', '').fillna(0.0).astype(float)
 
         percentage_columns = cleaning_data.detect_percentage_columns(
             ss['squad_data'])
@@ -73,19 +78,50 @@ if ss['squad_data'] is not None:
         "#### Basic Squad Summary."
     )
 
-    st.plotly_chart(plots.nationality_proportion(ss['squad_data']),
-                    use_container_width=True)
+
+    col1, col2, col3 = st.columns(3)
+
+
+    with col1:
+        ui.metric_card(title="Total Players ", content=str(ss['squad_data']['UID'].count()), key="total_players")
+        # with containers.card_container(key="nationalities_chart", styles=["height: 15px"]):
+        #     st.plotly_chart(plots.nationality_proportion(ss['squad_data']), use_container_width=True)
+
+    with col2:
+        ui.metric_card(title="Average Wage (£) p/w 💷", content=round(ss['squad_data']['Wage'].mean(), 2), key="average_wage")
+
+    with col3:
+        ui.metric_card(title="Average age ", content=round(ss["squad_data"]['Age'].mean(), 2), key="average age")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        with containers.card_container(key="nationalities_chart"):
+            st.plotly_chart(plots.nationality_proportion(ss['squad_data']), use_container_width=True, theme=None)
+
+
+    with col2:
+        with containers.card_container(key="age_spread"):
+            st.plotly_chart(plots.age_spread(ss['squad_data']), use_container_width=True, theme=None)
 
     st.write(
-        "#### Squad DNA score v/s the Age."
+        """
+        ### Player Types.
+        Get to know what types of players you have.
+        """
     )
 
-    st.plotly_chart(plots.dnascore_vs_age(
-        ss['squad_data']), use_container_width=True)
 
-    st.write(
-        '#### Squad DNA score v/s Wages'
-    )
+    # st.write(
+    #     "#### Squad DNA score v/s the Age."
+    # )
 
-    st.plotly_chart(plots.dnascore_vs_wage(
-        ss['squad_data']), use_container_width=True)
+    # st.plotly_chart(plots.dnascore_vs_age(
+    #     ss['squad_data']), use_container_width=True)
+
+    # st.write(
+    #     '#### Squad DNA score v/s Wages'
+    # )
+
+    # st.plotly_chart(plots.dnascore_vs_wage(
+    #     ss['squad_data']), use_container_width=True)

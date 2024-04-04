@@ -1,9 +1,25 @@
 import pandas as pd
 import plotly.express as px
+import plotly.io as pio
+
+
+# Disable plotly default theme.
+pio.templates.default = 'seaborn' 
 
 def nationality_proportion(df: pd.DataFrame):
     fig = px.pie(df, names="Nat", hole=.3)
     fig.update_traces(textposition='inside', textinfo='percent+label')
+    fig.update_layout(
+        title_text="Squad Nationality"
+    )
+
+    return fig
+
+def age_spread(df: pd.DataFrame):
+    fig = px.histogram(df, x="Age", nbins=20)
+    fig.update_layout(
+        title_text="Squad Age Distribution."
+    )
 
     return fig
 
