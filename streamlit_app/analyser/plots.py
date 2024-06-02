@@ -10,7 +10,7 @@ def nationality_proportion(df: pd.DataFrame):
     fig = px.pie(df, names="Nat", hole=.3)
     fig.update_traces(textposition='inside', textinfo='percent+label')
     fig.update_layout(
-        title_text="Squad Nationality"
+        title_text="Nationalities"
     )
 
     return fig
@@ -18,10 +18,30 @@ def nationality_proportion(df: pd.DataFrame):
 def age_spread(df: pd.DataFrame):
     fig = px.histogram(df, x="Age", nbins=20)
     fig.update_layout(
-        title_text="Squad Age Distribution."
+        title_text="Age Distribution."
     )
 
     return fig
+
+def wage_spread(df: pd.DataFrame):
+    fig = px.histogram(df, x="Wage", nbins=20)
+    fig.update_layout(
+        title_text="Wage Distribution."
+    )
+
+    return fig
+
+def wage_by_importance_bar(df: pd.DataFrame):
+    data = df.groupby('Agreed Playing Time')['Wage'].describe()[['mean', 'min', 'max', 'count']].reset_index()
+    data.sort_values(by="mean", inplace=True)
+
+    fig = px.bar(data_frame=data, y='Agreed Playing Time', x='mean', orientation='h')
+    fig.update_layout(
+        title_text="Wage by Player Importance."
+    )
+
+    return fig
+
 
 def dnascore_vs_age(df: pd.DataFrame):
     fig = px.scatter(df, 'Age', 'dna_score', hover_data=['Name', 'Position'], text="Name", width=1200, height=600)

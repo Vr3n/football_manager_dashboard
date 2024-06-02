@@ -4,11 +4,23 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    {
-        "command": "streamlit run app.py",
-        "name": "Streamlit Start",
-        "request": "launch",
-        "type": "node-terminal"
-    }
+        {
+            "command": "streamlit run streamlit_app/app.py",
+            "name": "Streamlit Start",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
+            "command": "cd backend && uvicorn main:app --reload",
+            "name": "Fastapi Backend",
+            "request": "launch",
+            "type": "node-terminal"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "FastAPI + Streamlit",
+            "configurations": ["Streamlit Start", "Fastapi Backend"]
+        }
     ]
 }

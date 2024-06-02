@@ -14,15 +14,204 @@ def get_dna_score(df: pd.DataFrame, dna_attribs: List[str]):
     return df
 
 
-def calculate_attributes_for_all_positions(df: pd.DataFrame):
+
+def calculate_player_abilities(df: pd.DataFrame) -> pd.DataFrame:
+    ## Defining the attribute type of columns needed to filter.
+    intelligence = ["Ant", "Fla", "Dec", "Tea", "Vis"]
+    focus = ["Cmp", "Cnt"]
+    endeavour = ["Agg", "Bra", "Det", "Wor"]
+
+    # Type of Intelligence.
+    creativity = ["Ant", "Dec", "Fla", "Tea", "Vis"]
+
+    movement = ["Ant", "Dec", "Tea"]
+    movement_att = ["OtB"] + ["Ant", "Dec", "Tea"]
+    movement_def = ["Pos"] + ["Ant", "Dec", "Tea"]
+
+    awareness_on_ball = ["Ant", "Tea", "Vis"]
+    awareness_off_ball = ["Ant", "Tea"]
+
+    decision_making_on_ball = ["Dec", "Fla", "Tea"]
+    decision_making_off_ball = ["Dec", "Tea"]
+
+    # Physical Abilities.
+    physical_presence_primary = ["Bal", "Str"]
+    physical_presence_key = endeavour
+    physical_presence = physical_presence_primary + physical_presence_key
+
+    aerial_presence_primary = ["Jum"]
+    aerial_presence_key = ["Det", "Wor"]
+    aerial_presence_rel = physical_presence
+    aerial_presence_other = ['Height']
+    aerial_presence = aerial_presence_primary + aerial_presence_key + aerial_presence_rel + aerial_presence_other
+
+    mobility_primary = ["Acc", "Agi", "Pac"]
+    mobility_key = ["Det", "Wor"]
+    mobility = mobility_primary + mobility_key
+
+    # Attacking Abilities.
+
+    off_the_ball_primary = ["OtB", "Cmp"]
+    off_the_ball_key = movement + focus + ['Det']
+    off_the_ball_rel = mobility + physical_presence
+
+    control_primary = ["Fir", "Tec", "Cmp"]
+    control_key = ["Ant", "Dec", "Fla", "Tea", "Vis", "Cmp", "Cnt", "Det"]
+    control_rel = aerial_presence + physical_presence
+
+    passing_ability_primary = ["Pas", "Tec", "Cmp"]
+    passing_ability_key = creativity + focus + ["Det"]
+
+
+    dribbling_ability_primary = ["Dri", "Tec", "Cmp"]
+    dribbling_ability_key = ["Ant", "Vis", "Dec", "Fla", "Cmp", "Cnt", "Det"]
+    dribbling_ability_rel = mobility + physical_presence
+
+    shooting_ability_primary = ["Fin", "Lon", "Tec", "Cmp"]
+    shooting_ability_key = ["Ant", "Dec", "Fla", "Tea", "Vis", "Cmp", "Cnt", "Det"]
+    shooting_ability_rel = aerial_presence + physical_presence
+
+    holdup_primary = ["Cmp"]
+    holdup_key = ["Ant", "Tea", "Dec", "Cmp", "Cnt", "Det"]
+    holdup_rel = physical_presence
+
+    # Defensive Abilities.
+
+    marking_ability_primary = ["Mar", "Cmp", "Pos"]
+    marking_ability_key = movement + focus + ["Det"]
+    marking_ability_rel = mobility + physical_presence
+
+    defensive_positioning_primary = ['Cmp', 'Pos']
+    defensive_positioning_key = movement + focus + ['Det']
+    defensive_positioning_rel = mobility + physical_presence
+
+    closing_down_ability_primary = ['Cmp', "Pos"]
+    closing_down_ability_key = movement + focus + endeavour
+    closing_down_ability_rel = mobility
+
+    tackling_ability_primary = ["Tck", "Cmp"]
+    tackling_ability_key = ["Ant", "Dec", "Cmp", "Cnt", "Det"]
+    tackling_ability_rel = physical_presence
+
+    intercepting_ability_primary = ['Cmp']
+    intercepting_ability_key = movement + focus + ['Det']
+    intercepting_ability_physical_key = mobility + physical_presence + aerial_presence
+    intercepting_ability = intercepting_ability_primary + intercepting_ability_key + intercepting_ability_physical_key
+
+    tracking_back_ability_primary = ['Cmp']
+    tracking_back_ability_key = movement + focus + ["Det"] + mobility
+    tracking_back_ability = tracking_back_ability_primary + tracking_back_ability_key
+
+    clearing_ability_primary = ['Hea', 'Tec', 'Cmp']
+    clearing_ability_key = awareness_off_ball + awareness_on_ball + ['Dec'] + focus + ['Det']
+    clearing_ability = clearing_ability_primary + clearing_ability_key
+
+    # Calculating the abilities.
+    df['intelligence'] =  (df[intelligence].sum(axis=1) / (len(intelligence) * 20)) * 100
+    df['focus'] =  (df[focus].sum(axis=1) / (len(focus) * 20)) * 100
+    df['endeavour'] =  (df[endeavour].sum(axis=1) / (len(endeavour) * 20)) * 100
+    df['creativity'] =  (df[creativity].sum(axis=1) / (len(creativity) * 20)) * 100
+    df['movement_att'] =  df[movement_att].sum(axis=1) / (len(movement_att) * 20)
+    df['movement_def'] =  df[movement_def].sum(axis=1) / (len(movement_def) * 20)
+    df['movement'] = round((df['movement_att'] * 0.5 +  df['movement_def'] * 0.5) * 100, 2)
+    df['awareness_on_ball'] =  df[awareness_on_ball].sum(axis=1) / (len(awareness_on_ball) * 20)
+    df['awareness_off_ball'] =  df[awareness_off_ball].sum(axis=1) / (len(awareness_off_ball) * 20)
+    df['awareness'] = round((df['awareness_on_ball'] * 0.5 +  df['awareness_off_ball'] * 0.5) * 100, 2)
+    df['decision_making_on_ball'] =  df[decision_making_on_ball].sum(axis=1) / (len(decision_making_on_ball) * 20)
+    df['decision_making_off_ball'] =  df[decision_making_off_ball].sum(axis=1) / (len(decision_making_off_ball) * 20)
+    df['decision_making'] = round((df['decision_making_on_ball'] * 0.5 +  df['decision_making_off_ball'] * 0.5) * 100, 2)
+
+    df['physical_presence_primary'] =  df[physical_presence_primary].sum(axis=1) / (len(physical_presence_primary) * 20)
+    df['physical_presence_key'] =  df[physical_presence_key].sum(axis=1) / (len(physical_presence_key) * 20)
+    df['physical_presence'] = round((df['physical_presence_primary'] * 0.7 +  df['physical_presence_key'] * 0.3) * 100, 2)
+
+    df['aerial_presence_primary'] =  df[aerial_presence_primary].sum(axis=1) / (len(aerial_presence_primary) * 20)
+    df['aerial_presence_key'] =  df[aerial_presence_key].sum(axis=1) / (len(aerial_presence_key) * 20)
+    df['aerial_presence_rel'] =  df[aerial_presence_rel].sum(axis=1) / (len(aerial_presence_rel) * 20)
+    df['aerial_presence_other'] =  df[aerial_presence_other].sum(axis=1) / 200
+    df['aerial_presence'] = round((df['aerial_presence_primary'] * 0.4 +  df['aerial_presence_key'] * 0.3 + df['aerial_presence_rel'] * 0.2 + df['aerial_presence_other'] * 0.1) * 100, 2)
+
+    df['mobility_primary'] =  df[mobility_primary].sum(axis=1) / (len(mobility_primary) * 20)
+    df['mobility_key'] =  df[mobility_key].sum(axis=1) / (len(mobility_key) * 20)
+    df['mobility'] = round((df['mobility_primary'] * 0.7 +  df['mobility_key'] * 0.3) * 100, 2)
+
+    df['off_the_ball_primary'] =  df[off_the_ball_primary].sum(axis=1) / (len(off_the_ball_primary) * 20)
+    df['off_the_ball_key'] =  df[off_the_ball_key].sum(axis=1) / (len(off_the_ball_key) * 20)
+    df['off_the_ball_rel'] =  df[off_the_ball_rel].sum(axis=1) / (len(off_the_ball_rel) * 20)
+    df['off_the_ball'] = round((df['off_the_ball_primary'] * 0.5 +  df['off_the_ball_key'] * 0.3 + df['off_the_ball_rel'] * 0.2) * 100, 2)
+
+    df['control_primary'] =  df[control_primary].sum(axis=1) / (len(control_primary) * 20)
+    df['control_key'] =  df[control_key].sum(axis=1) / (len(control_key) * 20)
+    df['control_rel'] =  df[control_rel].sum(axis=1) / (len(control_rel) * 20)
+    df['control'] = round((df['control_primary'] * 0.5 +  df['control_key'] * 0.3 + df['control_rel'] * 0.2) * 100, 2)
+
+    df['passing_ability_primary'] =  df[passing_ability_primary].sum(axis=1) / (len(passing_ability_primary) * 20)
+    df['passing_ability_key'] =  df[passing_ability_key].sum(axis=1) / (len(passing_ability_key) * 20)
+    df['passing_ability'] = round((df['passing_ability_primary'] * 0.7 +  df['passing_ability_key'] * 0.3) * 100, 2)
+
+    df['dribbling_ability_primary'] =  df[dribbling_ability_primary].sum(axis=1) / (len(dribbling_ability_primary) * 20)
+    df['dribbling_ability_key'] =  df[dribbling_ability_key].sum(axis=1) / (len(dribbling_ability_key) * 20)
+    df['dribbling_ability_rel'] =  df[dribbling_ability_rel].sum(axis=1) / (len(dribbling_ability_rel) * 20)
+    df['dribbling_ability'] = round((df['dribbling_ability_primary'] * 0.5 +  df['dribbling_ability_key'] * 0.3 + df['dribbling_ability_rel'] * 0.2) * 100, 2)
+
+    df['shooting_ability_primary'] =  df[shooting_ability_primary].sum(axis=1) / (len(shooting_ability_primary) * 20)
+    df['shooting_ability_key'] =  df[shooting_ability_key].sum(axis=1) / (len(shooting_ability_key) * 20)
+    df['shooting_ability_rel'] =  df[shooting_ability_rel].sum(axis=1) / (len(shooting_ability_rel) * 20)
+    df['shooting_ability'] = round((df['shooting_ability_primary'] * 0.5 +  df['shooting_ability_key'] * 0.3 + df['shooting_ability_rel'] * 0.2) * 100, 2)
+
+    df['holdup_primary'] =  df[holdup_primary].sum(axis=1) / (len(holdup_primary) * 20)
+    df['holdup_key'] =  df[holdup_key].sum(axis=1) / (len(holdup_key) * 20)
+    df['holdup_rel'] =  df[holdup_rel].sum(axis=1) / (len(holdup_rel) * 20)
+    df['holdup'] = round((df['holdup_primary'] * 0.5 +  df['holdup_key'] * 0.3 + df['holdup_rel'] * 0.2) * 100, 2)
+
+    df['marking_ability_primary'] =  df[marking_ability_primary].sum(axis=1) / (len(marking_ability_primary) * 20)
+    df['marking_ability_key'] =  df[marking_ability_key].sum(axis=1) / (len(marking_ability_key) * 20)
+    df['marking_ability_rel'] =  df[marking_ability_rel].sum(axis=1) / (len(marking_ability_rel) * 20)
+    df['marking_ability'] = round((df['marking_ability_primary'] * 0.5 +  df['marking_ability_key'] * 0.3 + df['marking_ability_rel'] * 0.2) * 100, 2)
+
+    df['defensive_positioning_primary'] =  df[defensive_positioning_primary].sum(axis=1) / (len(defensive_positioning_primary) * 20)
+    df['defensive_positioning_key'] =  df[defensive_positioning_key].sum(axis=1) / (len(defensive_positioning_key) * 20)
+    df['defensive_positioning_rel'] =  df[defensive_positioning_rel].sum(axis=1) / (len(defensive_positioning_rel) * 20)
+    df['defensive_positioning'] = round((df['defensive_positioning_primary'] * 0.5 +  df['defensive_positioning_key'] * 0.3 + df['defensive_positioning_rel'] * 0.2) * 100, 2)
+
+    df['closing_down_ability_primary'] =  df[closing_down_ability_primary].sum(axis=1) / (len(closing_down_ability_primary) * 20)
+    df['closing_down_ability_key'] =  df[closing_down_ability_key].sum(axis=1) / (len(closing_down_ability_key) * 20)
+    df['closing_down_ability_rel'] =  df[closing_down_ability_rel].sum(axis=1) / (len(closing_down_ability_rel) * 20)
+    df['closing_down_ability'] = round((df['closing_down_ability_primary'] * 0.5 +  df['closing_down_ability_key'] * 0.3 + df['closing_down_ability_rel'] * 0.2) * 100, 2)
+
+    df['tackling_ability_primary'] =  df[tackling_ability_primary].sum(axis=1) / (len(tackling_ability_primary) * 20)
+    df['tackling_ability_key'] =  df[tackling_ability_key].sum(axis=1) / (len(tackling_ability_key) * 20)
+    df['tackling_ability_rel'] =  df[tackling_ability_rel].sum(axis=1) / (len(tackling_ability_rel) * 20)
+    df['tackling_ability'] = round((df['tackling_ability_primary'] * 0.5 +  df['tackling_ability_key'] * 0.3 + df['tackling_ability_rel'] * 0.2) * 100, 2)
+
+    df['intercepting_ability_primary'] =  df[intercepting_ability_primary].sum(axis=1) / (len(intercepting_ability_primary) * 20)
+    df['intercepting_ability_key'] =  df[intercepting_ability_key].sum(axis=1) / (len(intercepting_ability_key) * 20)
+    df['intercepting_ability_physical_key'] =  df[intercepting_ability_physical_key].sum(axis=1) / (len(intercepting_ability_physical_key) * 20)
+    df['intercepting_ability'] = round((df['intercepting_ability_primary'] * 0.5 +  df['intercepting_ability_key'] * 0.25 + df['intercepting_ability_physical_key'] * 0.25) * 100, 2)
+
+    df['tracking_back_ability_primary'] =  df[tracking_back_ability_primary].sum(axis=1) / (len(tracking_back_ability_primary) * 20)
+    df['tracking_back_ability_key'] =  df[tracking_back_ability_key].sum(axis=1) / (len(tracking_back_ability_key) * 20)
+    df['tracking_back_ability'] = round((df['tracking_back_ability_primary'] * 0.7 +  df['tracking_back_ability_key'] * 0.3) * 100, 2)
+    
+    df['clearing_ability_primary'] =  df[clearing_ability_primary].sum(axis=1) / (len(clearing_ability_primary) * 20)
+    df['clearing_ability_key'] =  df[clearing_ability_key].sum(axis=1) / (len(clearing_ability_key) * 20)
+    df['clearing_ability'] = round((df['clearing_ability_primary'] * 0.7 +  df['clearing_ability_key'] * 0.3) * 100, 2)
+
+
+
+
+
+
+
+
+
+def calculate_attributes_of_positions(df: pd.DataFrame):
     # calculates Goalkeeper_Defend score
     df['gkd_key'] = ( df['Agi'] + df['Ref'] )
     df['gkd_green'] = ( df['Aer'] + df['Cmd'] + df['Han'] + df['Kic'] + df['Cnt'] + df['Pos'] )
     df['gkd_blue'] = ( df['1v1'] + df['Thr'] + df['Ant'] + df['Dec'] )
     df['gkd'] =( ( ( df['gkd_key'] * 5) + (df['gkd_green'] * 3) + (df['gkd_blue'] * 1) ) / 32)
     df.gkd= df.gkd.round(1)
-        
-
 
     # calculates Sweeper_keeper_Defend score
     df['skd_key'] = ( df['Agi'] + df['Ref'] )
@@ -30,8 +219,6 @@ def calculate_attributes_for_all_positions(df: pd.DataFrame):
     df['skd_blue'] = ( df['Aer'] + df['Fir'] + df['Han'] + df['Pas'] + df['TRO'] + df['Dec'] + df['Vis'] + df['Acc'] )
     df['skd'] =( ( ( df['skd_key'] * 5) + (df['skd_green'] * 3) + (df['skd_blue'] * 1) ) / 36)
     df.skd= df.skd.round(1)
-        
-
 
     # calculates Sweeper_keeper_Support score
     df['sks_key'] = ( df['Agi'] + df['Ref'] )
