@@ -11,16 +11,28 @@
             "type": "node-terminal"
         },
         {
-            "command": "cd backend && uvicorn main:app --reload",
-            "name": "Fastapi Backend",
+            "name": "Flask",
+            "type": "debugpy",
             "request": "launch",
-            "type": "node-terminal"
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "run.py",
+                "FLASK_DEBUG": "1"
+            },
+            "args": [
+                "run",
+            ],
+            "jinja": true,
+            "autoStartBrowser": false
         }
     ],
     "compounds": [
         {
-            "name": "FastAPI + Streamlit",
-            "configurations": ["Streamlit Start", "Fastapi Backend"]
+            "name": "Flask + Streamlit",
+            "configurations": [
+                "Streamlit Start",
+                "Flask"
+            ]
         }
     ]
 }
