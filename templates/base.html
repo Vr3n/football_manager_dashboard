@@ -1,0 +1,42 @@
+{% load compress %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fm Dashboard</title>
+
+    {% compress css %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    {% endcompress %}
+
+</head>
+<body>
+    {% include 'includes/navbar.html' %}
+
+    <main class="mx-auto max-w-screen-xl p-4">
+        {% block content %}
+        {% endblock content %}
+    </main>
+
+
+    <script src="https://kit.fontawesome.com/1d56d2408d.js" crossorigin="anonymous"></script>
+    <script src="{% static 'vendors/ripple.js' %}"></script>
+    <script src="{% static 'vendors/htmx.min.js' %}"></script>
+    <script src="{% static 'vendors/apache_echarts/echarts.min.js' %}"></script>
+
+
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+          })
+    </script>
+
+    <!-- -->
+    {% block custom_js %}
+    {% endblock custom_js %}
+    <!-- -->
+</body>
+</html>

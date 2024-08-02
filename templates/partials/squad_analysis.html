@@ -1,0 +1,39 @@
+<div class="my-4 p-6 w-full flex flex-col text-gray-700 bg-white shadow-md bg-clip-border rounded-xl overflow-x-scroll">
+    <h1 class="font-sans text-2xl antialiased font-semibold leading-snug tracking-normal text-inherit text-gray-800">
+        Your Squad Summary.
+    </h1>
+
+    <div id="wage_chart" class="max-w-lg"></div>
+
+</div>
+
+{% block custom_js %}
+<script>
+    window.onload = (event) => {
+      const wage_chart_card = document.getElementById("wage_chart")
+      let barChart = echarts.init(wage_chart_card, { width: 200, height: 200 })
+      player_names = [{% for w in squad_wages %}'{{w.name}}',{% endfor %}]
+      player_wages = [{% for w in squad_wages %}{{ w.wage }},{% endfor %}]
+      console.log(player_wages)
+    
+      const option = {
+        xAxis: {
+          type: 'category',
+          data: player_names,
+        },
+        yAxis: {
+          type: 'value',
+        },
+        series: [
+          {
+            data: player_wages,
+            type: 'bar'
+          }
+        ]
+      }
+
+      barChart.setOption(option);
+
+    }
+</script>
+{% endblock custom_js %}
